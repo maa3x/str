@@ -1,0 +1,2 @@
+# str
+Go string class
