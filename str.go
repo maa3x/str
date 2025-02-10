@@ -547,16 +547,25 @@ func (s Str) TrimFunc(fn func(rune) bool) Str {
 	return Str(strings.TrimFunc(string(s), fn))
 }
 
-func (s Str) TrimPrefix(prefix string) Str {
-	return Str(strings.TrimPrefix(string(s), prefix))
+func (s Str) TrimPrefix(prefixes ...string) Str {
+	for i := range prefixes {
+		s = Str(strings.TrimPrefix(string(s), prefixes[i]))
+	}
+	return s
 }
 
-func (s Str) TrimSuffix(suffix string) Str {
-	return Str(strings.TrimSuffix(string(s), suffix))
+func (s Str) TrimSuffix(suffixes ...string) Str {
+	for i := range suffixes {
+		s = Str(strings.TrimSuffix(string(s), suffixes[i]))
+	}
+	return s
 }
 
-func (s Str) TrimValue(value string) Str {
-	return Str(strings.Trim(string(s), value))
+func (s Str) TrimValue(values ...string) Str {
+	for i := range values {
+		s = Str(strings.Trim(string(s), values[i]))
+	}
+	return s
 }
 
 func (s Str) MarshalJSON() ([]byte, error) {
