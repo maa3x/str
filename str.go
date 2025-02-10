@@ -390,7 +390,13 @@ func (s Str) RuneCount() int {
 }
 
 func (s Str) RuneIndex(r rune) int {
-	return strings.IndexRune(string(s), r)
+	runes := []rune(s)
+	for i := range runes {
+		if runes[i] == r {
+			return i
+		}
+	}
+	return -1
 }
 
 func (s Str) Runes() Array {
