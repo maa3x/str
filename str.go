@@ -17,6 +17,8 @@ type Str string
 
 func New(v any) Str {
 	switch v := v.(type) {
+	case Str:
+		return v
 	case string:
 		return Str(v)
 	case byte:
@@ -116,52 +118,71 @@ func (s Str) Count(search string) int {
 	return strings.Count(string(s), search)
 }
 
-func (s Str) Cut(search string) (before, after string, found bool) {
-	return strings.Cut(string(s), search)
+func (s Str) Cut(search string) (before, after Str, found bool) {
+	b, a, f := strings.Cut(string(s), search)
+	return Str(b), Str(a), f
 }
 
-func (s Str) CutPrefix(prefix string) (string, bool) {
-	return strings.CutPrefix(string(s), prefix)
+func (s Str) CutPrefix(prefix string) (Str, bool) {
+	a, f := strings.CutPrefix(string(s), prefix)
+	return Str(a), f
 }
 
-func (s Str) CutSuffix(suffix string) (string, bool) {
-	return strings.CutSuffix(string(s), suffix)
+func (s Str) CutSuffix(suffix string) (Str, bool) {
+	b, f := strings.CutSuffix(string(s), suffix)
+	return Str(b), f
 }
 
-func (s Str) Fields() []string {
-	return strings.Fields(string(s))
+func (s Str) Fields() Array {
+	return NewArray(strings.Fields(string(s)))
 }
 
-func (s Str) FieldsFunc(fn func(rune) bool) []string {
-	return strings.FieldsFunc(string(s), fn)
+func (s Str) FieldsFunc(fn func(rune) bool) Array {
+	return NewArray(strings.FieldsFunc(string(s), fn))
 }
 
-func (s Str) Find(pattern string) string {
+func (s Str) Find(pattern string) Str {
 	if re, err := regexp.Compile(pattern); err == nil {
-		return re.FindString(string(s))
+		return s.FindRegex(re)
 	}
 	return ""
 }
 
-func (s Str) FindAll(pattern string) []string {
+func (s Str) FindAll(pattern string) Array {
 	if re, err := regexp.Compile(pattern); err == nil {
-		return re.FindAllString(string(s), -1)
+		return s.FindAllRegex(re)
 	}
 	return nil
 }
 
 func (s Str) FindAllIndex(pattern string) [][]int {
 	if re, err := regexp.Compile(pattern); err == nil {
-		return re.FindAllStringIndex(string(s), -1)
+		return s.FindAllIndexRegex(re)
 	}
 	return nil
 }
 
 func (s Str) FindIndex(pattern string) []int {
 	if re, err := regexp.Compile(pattern); err == nil {
-		return re.FindStringIndex(string(s))
+		return s.FindIndexRegex(re)
 	}
 	return nil
+}
+
+func (s Str) FindRegex(re *regexp.Regexp) Str {
+	return Str(re.FindString(string(s)))
+}
+
+func (s Str) FindAllRegex(re *regexp.Regexp) Array {
+	return NewArray(re.FindAllString(string(s), -1))
+}
+
+func (s Str) FindAllIndexRegex(re *regexp.Regexp) [][]int {
+	return re.FindAllStringIndex(string(s), -1)
+}
+
+func (s Str) FindIndexRegex(re *regexp.Regexp) []int {
+	return re.FindStringIndex(string(s))
 }
 
 func (s Str) HasPrefix(prefixes ...string) bool {
@@ -214,15 +235,22 @@ func (s Str) Map(fn func(rune) rune) Str {
 	return Str(strings.Map(fn, string(s)))
 }
 
-func (s Str) Match(pattern string) bool {
-	if re, err := regexp.Compile(pattern); err == nil {
-		return s.MatchRegex(re)
+func (s Str) Match(patterns ...string) bool {
+	for i := range patterns {
+		if re, err := regexp.Compile(patterns[i]); err == nil {
+			return s.MatchRegex(re)
+		}
 	}
 	return false
 }
 
-func (s Str) MatchRegex(re *regexp.Regexp) bool {
-	return re.MatchString(string(s))
+func (s Str) MatchRegex(regexes ...*regexp.Regexp) bool {
+	for i := range regexes {
+		if regexes[i].MatchString(string(s)) {
+			return true
+		}
+	}
+	return false
 }
 
 func (s Str) PadEnd(length int, pad string) Str {
@@ -263,6 +291,15 @@ func (s Str) ParseUint() (uint64, error) {
 	return strconv.ParseUint(string(s), 10, 64)
 }
 
+func (s Str) PartOf(values ...string) bool {
+	for i := range values {
+		if strings.Contains(values[i], string(s)) {
+			return true
+		}
+	}
+	return false
+}
+
 func (s Str) PopEnd() (rune, Str) {
 	if runes := []rune(s); len(runes) > 0 {
 		last := len(runes) - 1
@@ -298,11 +335,7 @@ func (s Str) Repeat(count int) Str {
 	return Str(strings.Repeat(string(s), count))
 }
 
-func (s Str) Replace(old, new string, n int) Str {
-	return Str(strings.Replace(string(s), old, new, n))
-}
-
-func (s Str) ReplaceAll(old, new string) Str {
+func (s Str) Replace(old, new string) Str {
 	return Str(strings.ReplaceAll(string(s), old, new))
 }
 
@@ -327,6 +360,10 @@ func (s Str) ReplaceLast(old, new string) Str {
 		return s
 	}
 	return Str(string(s[:lastIdx]) + new + string(s[lastIdx+len(old):]))
+}
+
+func (s Str) ReplaceN(old, new string, n int) Str {
+	return Str(strings.Replace(string(s), old, new, n))
 }
 
 func (s Str) ReplacePattern(pattern, new string) Str {
@@ -354,6 +391,10 @@ func (s Str) RuneCount() int {
 
 func (s Str) RuneIndex(r rune) int {
 	return strings.IndexRune(string(s), r)
+}
+
+func (s Str) Runes() Array {
+	return NewArray([]rune(s))
 }
 
 func (s Str) Slice(start, end int) Str {
@@ -431,23 +472,23 @@ func (s Str) SliceTo(index int) Str {
 	return s[:index]
 }
 
-func (s Str) Split(delim string) []string {
-	return strings.Split(string(s), delim)
+func (s Str) Split(delim string) Array {
+	return s.SplitN(delim, -1)
 }
 
-func (s Str) SplitN(delim string, count int) []string {
-	return strings.SplitN(string(s), delim, count)
+func (s Str) SplitN(delim string, count int) Array {
+	return NewArray(strings.SplitN(string(s), delim, count))
 }
 
-func (s Str) SplitPattern(pattern string) []string {
+func (s Str) SplitPattern(pattern string) Array {
 	if re, err := regexp.Compile(pattern); err == nil {
 		return s.SplitRegex(re)
 	}
-	return []string{string(s)}
+	return Array{s}
 }
 
-func (s Str) SplitRegex(regex *regexp.Regexp) []string {
-	return regex.Split(string(s), -1)
+func (s Str) SplitRegex(regex *regexp.Regexp) Array {
+	return NewArray(regex.Split(string(s), -1))
 }
 
 func (s Str) ToCamel() Str {

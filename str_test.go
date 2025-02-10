@@ -1024,55 +1024,55 @@ func TestSplit(t *testing.T) {
 		name     string
 		input    Str
 		delim    string
-		expected []string
+		expected Array
 	}{
 		{
 			name:     "split on space",
 			input:    "hello world test",
 			delim:    " ",
-			expected: []string{"hello", "world", "test"},
+			expected: Array{"hello", "world", "test"},
 		},
 		{
 			name:     "split on comma",
 			input:    "a,b,c",
 			delim:    ",",
-			expected: []string{"a", "b", "c"},
+			expected: Array{"a", "b", "c"},
 		},
 		{
 			name:     "split with empty delimiter",
 			input:    "hello",
 			delim:    "",
-			expected: []string{"h", "e", "l", "l", "o"},
+			expected: Array{"h", "e", "l", "l", "o"},
 		},
 		{
 			name:     "split empty string",
 			input:    "",
 			delim:    ",",
-			expected: []string{""},
+			expected: Array{""},
 		},
 		{
 			name:     "split with delimiter not in string",
 			input:    "hello",
 			delim:    ",",
-			expected: []string{"hello"},
+			expected: Array{"hello"},
 		},
 		{
 			name:     "split with multi-character delimiter",
 			input:    "hello::world::test",
 			delim:    "::",
-			expected: []string{"hello", "world", "test"},
+			expected: Array{"hello", "world", "test"},
 		},
 		{
 			name:     "split with leading delimiter",
 			input:    ",a,b,c",
 			delim:    ",",
-			expected: []string{"", "a", "b", "c"},
+			expected: Array{"", "a", "b", "c"},
 		},
 		{
 			name:     "split with trailing delimiter",
 			input:    "a,b,c,",
 			delim:    ",",
-			expected: []string{"a", "b", "c", ""},
+			expected: Array{"a", "b", "c", ""},
 		},
 	}
 
@@ -1092,63 +1092,63 @@ func TestSplitN(t *testing.T) {
 		input    Str
 		delim    string
 		count    int
-		expected []string
+		expected Array
 	}{
 		{
 			name:     "split on space with count 2",
 			input:    "hello world test",
 			delim:    " ",
 			count:    2,
-			expected: []string{"hello", "world test"},
+			expected: Array{"hello", "world test"},
 		},
 		{
 			name:     "split on comma with count 3",
 			input:    "a,b,c,d",
 			delim:    ",",
 			count:    3,
-			expected: []string{"a", "b", "c,d"},
+			expected: Array{"a", "b", "c,d"},
 		},
 		{
 			name:     "split with count larger than segments",
 			input:    "a,b,c",
 			delim:    ",",
 			count:    5,
-			expected: []string{"a", "b", "c"},
+			expected: Array{"a", "b", "c"},
 		},
 		{
 			name:     "split with empty delimiter",
 			input:    "hello",
 			delim:    "",
 			count:    3,
-			expected: []string{"h", "e", "llo"},
+			expected: Array{"h", "e", "llo"},
 		},
 		{
 			name:     "split empty string",
 			input:    "",
 			delim:    ",",
 			count:    2,
-			expected: []string{""},
+			expected: Array{""},
 		},
 		{
 			name:     "split with negative count",
 			input:    "a,b,c",
 			delim:    ",",
 			count:    -1,
-			expected: []string{"a", "b", "c"},
+			expected: Array{"a", "b", "c"},
 		},
 		{
 			name:     "split with count 1",
 			input:    "a,b,c",
 			delim:    ",",
 			count:    1,
-			expected: []string{"a,b,c"},
+			expected: Array{"a,b,c"},
 		},
 		{
 			name:     "split with delimiter not in string",
 			input:    "hello",
 			delim:    ",",
 			count:    2,
-			expected: []string{"hello"},
+			expected: Array{"hello"},
 		},
 	}
 
@@ -1167,55 +1167,55 @@ func TestSplitPattern(t *testing.T) {
 		name     string
 		input    Str
 		pattern  string
-		expected []string
+		expected Array
 	}{
 		{
 			name:     "split on word boundaries",
 			input:    "hello world test",
 			pattern:  `\s+`,
-			expected: []string{"hello", "world", "test"},
+			expected: Array{"hello", "world", "test"},
 		},
 		{
 			name:     "split on numbers",
 			input:    "abc123def456ghi",
 			pattern:  `\d+`,
-			expected: []string{"abc", "def", "ghi"},
+			expected: Array{"abc", "def", "ghi"},
 		},
 		{
 			name:     "split with capturing groups",
 			input:    "a=b,c=d",
 			pattern:  `[,=]`,
-			expected: []string{"a", "b", "c", "d"},
+			expected: Array{"a", "b", "c", "d"},
 		},
 		{
 			name:     "split with invalid pattern",
 			input:    "hello world",
 			pattern:  "[",
-			expected: []string{"hello world"},
+			expected: Array{"hello world"},
 		},
 		{
 			name:     "split empty string",
 			input:    "",
 			pattern:  `\s+`,
-			expected: []string{""},
+			expected: Array{""},
 		},
 		{
 			name:     "split with pattern not in string",
 			input:    "hello",
 			pattern:  `\d`,
-			expected: []string{"hello"},
+			expected: Array{"hello"},
 		},
 		{
 			name:     "split with complex pattern",
 			input:    "hello:world;test,example",
 			pattern:  `[;,:]`,
-			expected: []string{"hello", "world", "test", "example"},
+			expected: Array{"hello", "world", "test", "example"},
 		},
 		{
 			name:     "split with consecutive delimiters",
 			input:    "a,,b,,c",
 			pattern:  `,+`,
-			expected: []string{"a", "b", "c"},
+			expected: Array{"a", "b", "c"},
 		},
 	}
 
@@ -2318,19 +2318,19 @@ func TestFindAll(t *testing.T) {
 		name    string
 		input   Str
 		pattern string
-		want    []string
+		want    Array
 	}{
 		{
 			name:    "simple pattern multiple matches",
 			input:   "hello world hello world",
 			pattern: "hello",
-			want:    []string{"hello", "hello"},
+			want:    Array{"hello", "hello"},
 		},
 		{
 			name:    "pattern with wildcard",
 			input:   "test123test456test",
 			pattern: `\d+`,
-			want:    []string{"123", "456"},
+			want:    Array{"123", "456"},
 		},
 		{
 			name:    "no matches",
@@ -2342,7 +2342,7 @@ func TestFindAll(t *testing.T) {
 			name:    "pattern with character class",
 			input:   "a1b2c3d4",
 			pattern: `[0-9]`,
-			want:    []string{"1", "2", "3", "4"},
+			want:    Array{"1", "2", "3", "4"},
 		},
 		{
 			name:    "empty string",
@@ -2360,19 +2360,19 @@ func TestFindAll(t *testing.T) {
 			name:    "pattern with groups",
 			input:   "test123test456",
 			pattern: `(\d+)`,
-			want:    []string{"123", "456"},
+			want:    Array{"123", "456"},
 		},
 		{
 			name:    "unicode string multiple matches",
 			input:   "你好世界你好世界",
 			pattern: "你好",
-			want:    []string{"你好", "你好"},
+			want:    Array{"你好", "你好"},
 		},
 		{
 			name:    "overlapping matches not allowed",
 			input:   "aaa",
 			pattern: "aa",
-			want:    []string{"aa"},
+			want:    Array{"aa"},
 		},
 	}
 
@@ -2391,7 +2391,7 @@ func TestFind(t *testing.T) {
 		name    string
 		input   Str
 		pattern string
-		want    string
+		want    Str
 	}{
 		{
 			name:    "simple pattern match",
